@@ -12,16 +12,21 @@ function getUserLocation() {
       function (position) {
         const lat = position.coords.latitude;
         const lon = position.coords.longitude;
+        console.log("User location:", lat, lon);
         map.setView([lat, lon], 15);
         L.marker([lat, lon]).addTo(map).bindPopup("You are here").openPopup();
         findNearbyRestaurants(lat, lon);
       },
       function (error) {
         console.error("Error getting location:", error);
+        alert(
+          "Unable to get your location. Please check your browser settings."
+        );
       }
     );
   } else {
     console.error("Geolocation is not supported by this browser.");
+    alert("Geolocation is not supported by your browser.");
   }
 }
 
@@ -38,14 +43,29 @@ function findNearbyRestaurants(lat, lon) {
     out center;
     `;
 
+  console.log("Querying Overpass API...");
   fetch(
     `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`
   )
-    .then((response) => response.json())
-    .then((data) => {
-      displayRestaurants(data.elements);
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
     })
-    .catch((error) => console.error("Error fetching restaurants:", error));
+    .then((data) => {
+      console.log("Overpass API response:", data);
+      if (data.elements && data.elements.length > 0) {
+        displayRestaurants(data.elements);
+      } else {
+        console.log("No restaurants found nearby.");
+        alert("No restaurants found nearby. Try increasing the search radius.");
+      }
+    })
+    .catch((error) => {
+      console.error("Error fetching restaurants:", error);
+      alert("Error fetching nearby restaurants. Please try again later.");
+    });
 }
 
 // Display restaurants on the map
@@ -53,14 +73,23 @@ function displayRestaurants(restaurants) {
   const resultsDiv = document.getElementById("results");
   resultsDiv.innerHTML = "<h2>Nearby Restaurants:</h2>";
 
+  console.log("Displaying restaurants:", restaurants);
   restaurants.forEach((restaurant) => {
-    const lat = restaurant.lat || restaurant.center.lat;
-    const lon = restaurant.lon || restaurant.center.lon;
+    const lat = restaurant.lat || (restaurant.center && restaurant.center.lat);
+    const lon = restaurant.lon || (restaurant.center && restaurant.center.lon);
     const name = restaurant.tags.name || "Unnamed restaurant";
 
-    L.marker([lat, lon]).addTo(map).bindPopup(name);
-    resultsDiv.innerHTML += `<p>${name}</p>`;
+    if (lat && lon) {
+      L.marker([lat, lon]).addTo(map).bindPopup(name);
+      resultsDiv.innerHTML += `<p>${name}</p>`;
+    } else {
+      console.warn("Invalid coordinates for restaurant:", restaurant);
+    }
   });
+
+  if (resultsDiv.innerHTML === "<h2>Nearby Restaurants:</h2>") {
+    resultsDiv.innerHTML += "<p>No valid restaurants found.</p>";
+  }
 }
 
 // Call getUserLocation when the page loads
