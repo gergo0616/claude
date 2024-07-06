@@ -1,19 +1,34 @@
 // Initialize the map
-const map = L.map("map").setView([46.680790058363776, 21.09654162212722], 15);
+const map = L.map("map").setView([0, 0], 15); // Default center at (0, 0)
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution:
     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
 
-// Add a marker for the specific restaurant
-L.marker([46.680790058363776, 21.09654162212722])
-  .addTo(map)
-  .bindPopup("Specified Restaurant Location")
-  .openPopup();
+// Function to get user's current location
+function getUserLocation() {
+  if ("geolocation" in navigator) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        map.setView([latitude, longitude], 15);
+        findNearbyRestaurants(latitude, longitude);
+      },
+      (error) => {
+        console.error("Error getting user location:", error);
+        alert(
+          "Error getting your location. Please allow location access and try again."
+        );
+      }
+    );
+  } else {
+    alert("Geolocation is not supported by your browser.");
+  }
+}
 
-// Find nearby restaurants using Overpass API
+// Function to find nearby restaurants using Overpass API
 function findNearbyRestaurants(lat, lon) {
-  const radius = 1000; // 1km radius
+  const radius = document.getElementById("radius").value || 1000; // Default radius 1000 meters
   const query = `
     [out:json];
     (
@@ -22,7 +37,7 @@ function findNearbyRestaurants(lat, lon) {
       relation["amenity"="restaurant"](around:${radius},${lat},${lon});
     );
     out center;
-    `;
+  `;
 
   console.log("Querying Overpass API...");
   fetch(
@@ -49,7 +64,7 @@ function findNearbyRestaurants(lat, lon) {
     });
 }
 
-// Display restaurants on the map
+// Function to display restaurants on the map
 function displayRestaurants(restaurants) {
   const resultsDiv = document.getElementById("results");
   resultsDiv.innerHTML = "<h2>Nearby Restaurants:</h2>";
@@ -73,5 +88,10 @@ function displayRestaurants(restaurants) {
   }
 }
 
-// Call findNearbyRestaurants with the provided coordinates
-findNearbyRestaurants(46.680790058363776, 21.09654162212722);
+// Function to initiate search with user's current location
+function searchNearbyRestaurants() {
+  getUserLocation();
+}
+
+// Call getUserLocation() to start
+getUserLocation();
