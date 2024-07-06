@@ -5,6 +5,8 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
 
+let userMarker = null; // Initialize userMarker variable
+
 // Function to get user's current location
 function getUserLocation() {
   if ("geolocation" in navigator) {
@@ -12,6 +14,26 @@ function getUserLocation() {
       (position) => {
         const { latitude, longitude } = position.coords;
         map.setView([latitude, longitude], 15);
+
+        // Remove previous "you are here" marker if exists
+        if (userMarker) {
+          map.removeLayer(userMarker);
+        }
+
+        // Add new "you are here" marker
+        const redIcon = L.icon({
+          iconUrl: "https://leafletjs.com/examples/custom-icons/leaf-red.png",
+          iconSize: [25, 41],
+          iconAnchor: [12, 41],
+          popupAnchor: [1, -34],
+          shadowSize: [41, 41],
+        });
+
+        userMarker = L.marker([latitude, longitude], { icon: redIcon })
+          .addTo(map)
+          .bindPopup("You are here")
+          .openPopup();
+
         findNearbyRestaurants(latitude, longitude);
       },
       (error) => {
