@@ -87,7 +87,7 @@ function displayRestaurants(restaurants) {
     }
   });
 
-  if (resultsDiv.innerHTML === "<h2>Nearby Restaurants:</h2>") {
+  if (resultsDiv.innerHTML === "<h2>Nearby fasz Restaurants:</h2>") {
     resultsDiv.innerHTML += "<p>No valid restaurants found.</p>";
   }
 }
