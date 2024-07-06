@@ -71,7 +71,7 @@ function findNearbyRestaurants(lat, lon) {
 // Display restaurants on the map
 function displayRestaurants(restaurants) {
   const resultsDiv = document.getElementById("results");
-  resultsDiv.innerHTML = "<h2>Nearby Restaurants:</h2>";
+  resultsDiv.innerHTML = "<h2>Nearby fasz Restaurants:</h2>";
 
   console.log("Displaying restaurants:", restaurants);
   restaurants.forEach((restaurant) => {
@@ -87,7 +87,7 @@ function displayRestaurants(restaurants) {
     }
   });
 
-  if (resultsDiv.innerHTML === "<h2>Nearby fasz Restaurants:</h2>") {
+  if (resultsDiv.innerHTML === "<h2>Nearby Restaurants:</h2>") {
     resultsDiv.innerHTML += "<p>No valid restaurants found.</p>";
   }
 }
