@@ -1,34 +1,15 @@
 // Initialize the map
-const map = L.map("map").setView([0, 0], 13);
+const map = L.map("map").setView([46.680790058363776, 21.09654162212722], 15);
 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
   attribution:
     '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 }).addTo(map);
 
-// Get user's location
-function getUserLocation() {
-  if ("geolocation" in navigator) {
-    navigator.geolocation.getCurrentPosition(
-      function (position) {
-        const lat = position.coords.latitude;
-        const lon = position.coords.longitude;
-        console.log("User location:", lat, lon);
-        map.setView([lat, lon], 15);
-        L.marker([lat, lon]).addTo(map).bindPopup("You are here").openPopup();
-        findNearbyRestaurants(lat, lon);
-      },
-      function (error) {
-        console.error("Error getting location:", error);
-        alert(
-          "Unable to get your location. Please check your browser settings."
-        );
-      }
-    );
-  } else {
-    console.error("Geolocation is not supported by this browser.");
-    alert("Geolocation is not supported by your browser.");
-  }
-}
+// Add a marker for the specific restaurant
+L.marker([46.680790058363776, 21.09654162212722])
+  .addTo(map)
+  .bindPopup("Specified Restaurant Location")
+  .openPopup();
 
 // Find nearby restaurants using Overpass API
 function findNearbyRestaurants(lat, lon) {
@@ -92,5 +73,5 @@ function displayRestaurants(restaurants) {
   }
 }
 
-// Call getUserLocation when the page loads
-getUserLocation();
+// Call findNearbyRestaurants with the provided coordinates
+findNearbyRestaurants(46.680790058363776, 21.09654162212722);
