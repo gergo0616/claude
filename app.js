@@ -12,18 +12,6 @@ function getUserLocation() {
       (position) => {
         const { latitude, longitude } = position.coords;
         map.setView([latitude, longitude], 15);
-
-        // Remove previous "you are here" marker if exists
-        if (userMarker) {
-          map.removeLayer(userMarker);
-        }
-
-        // Add new "you are here" marker
-        userMarker = L.marker([latitude, longitude])
-          .addTo(map)
-          .bindPopup("You are here")
-          .openPopup();
-
         findNearbyRestaurants(latitude, longitude);
       },
       (error) => {
