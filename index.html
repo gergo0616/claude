@@ -12,12 +12,13 @@
 <body>
     <h1>Nearby Restaurants</h1>
     <div id="map"></div>
-    <div id="results"></div>
     <div>
         <label for="radius">Search Radius (meters):</label>
         <input type="number" id="radius" value="1000">
         <button onclick="searchNearbyRestaurants()">Search</button>
     </div>
+    <div id="results"></div>
+    
 
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="app.js"></script>
