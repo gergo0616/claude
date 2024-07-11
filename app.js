@@ -7,6 +7,7 @@ L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
 
 let userMarker = null; // Initialize userMarker variable
 let placesService; // Initialize placesService variable
+let restaurants = []; // Global variable to store restaurant data
 
 function initMap() {
   console.log("Google Maps API initialized");
@@ -97,7 +98,7 @@ function findNearbyRestaurants(lat, lon) {
     return;
   }
 
-  const radius = document.getElementById("radius").value || 1000;
+  const radius = document.getElementById("radius").value;
   const location = new google.maps.LatLng(lat, lon);
 
   const request = {
@@ -112,12 +113,50 @@ function findNearbyRestaurants(lat, lon) {
     console.log("Places API response status:", status);
     console.log("Places API results:", results);
     if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-      displayRestaurants(results);
+      restaurants = results.map((restaurant) => ({
+        ...restaurant,
+        distance: getDistance(
+          lat,
+          lon,
+          restaurant.geometry.location.lat(),
+          restaurant.geometry.location.lng()
+        ),
+      }));
+      sortRestaurants();
     } else {
       console.error("Error fetching restaurants:", status);
       alert("Error fetching nearby restaurants. Please try again later.");
     }
   });
+}
+
+function getDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Radius of the earth in km
+  const dLat = deg2rad(lat2 - lat1);
+  const dLon = deg2rad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(deg2rad(lat1)) *
+      Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const d = R * c; // Distance in km
+  return d;
+}
+
+function deg2rad(deg) {
+  return deg * (Math.PI / 180);
+}
+
+function sortRestaurants() {
+  const sortBy = document.getElementById("sort").value;
+  if (sortBy === "distance") {
+    restaurants.sort((a, b) => a.distance - b.distance);
+  } else if (sortBy === "rating") {
+    restaurants.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+  }
+  displayRestaurants(restaurants);
 }
 
 function displayRestaurants(restaurants) {
@@ -154,6 +193,7 @@ function displayRestaurants(restaurants) {
       <p>Rating: ${restaurant.rating ? restaurant.rating + "/5" : "N/A"}</p>
       <p>Type: ${restaurant.types ? restaurant.types.join(", ") : "N/A"}</p>
       <p>${restaurant.vicinity || "Address not available"}</p>
+      <p>Distance: ${restaurant.distance.toFixed(2)} km</p>
     `;
 
     resultsDiv.appendChild(restaurantDiv);
@@ -191,7 +231,8 @@ function searchNearbyRestaurants() {
 // Function to update the displayed radius value
 function updateRadiusValue() {
   const radiusValue = document.getElementById("radius").value;
-  document.getElementById("radiusValue").textContent = radiusValue;
+  const radiusInKm = (radiusValue / 1000).toFixed(1);
+  document.getElementById("radiusValue").textContent = radiusInKm;
 }
 
 // The initMap function will be called by the Google Maps API once it's loaded

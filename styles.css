@@ -2,16 +2,26 @@ body {
     font-family: 'Arial', sans-serif;
     line-height: 1.6;
     color: #333;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
+    margin: 0;
+    padding: 0;
     background-color: #f4f4f4;
 }
 
-h1 {
+header {
+    background-color: #2c3e50;
+    color: #ecf0f1;
     text-align: center;
-    color: #2c3e50;
-    margin-bottom: 30px;
+    padding: 1rem;
+}
+
+h1 {
+    margin: 0;
+}
+
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
 #map {
@@ -27,6 +37,14 @@ h1 {
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.search-controls, .filter-controls {
+    display: flex;
+    align-items: center;
 }
 
 label {
@@ -35,16 +53,17 @@ label {
 }
 
 #radius {
-    width: 70%;
+    width: 200px;
     margin-right: 10px;
 }
 
 #radiusValue {
     font-weight: bold;
     color: #3498db;
+    margin-right: 10px;
 }
 
-button {
+button, select {
     background-color: #3498db;
     color: white;
     border: none;
@@ -54,7 +73,7 @@ button {
     transition: background-color 0.3s ease;
 }
 
-button:hover {
+button:hover, select:hover {
     background-color: #2980b9;
 }
 
@@ -102,6 +121,15 @@ button:hover {
 }
 
 @media (max-width: 768px) {
+    .controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-controls, .filter-controls {
+        margin-bottom: 10px;
+    }
+
     #results {
         grid-template-columns: 1fr;
     }
